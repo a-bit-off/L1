@@ -5,8 +5,8 @@
 package main
 
 import (
-	"sync"
 	"fmt"
+	"sync"
 )
 
 type ConcurrencyMap struct {
@@ -37,9 +37,9 @@ func main() {
 		go func(k int, v string, count int) {
 			defer wg.Done()
 			m.Add(k, v) // ADD
-			if count % 2 == 0 {
-				m.Update(k, v + "Update") // UPDATE
-			} else if count % 3 == 0 {
+			if count%2 == 0 {
+				m.Update(k, v+"Update") // UPDATE
+			} else if count%3 == 0 {
 				m.Delete(k) // DELETE
 			}
 		}(k, v, count)
@@ -58,13 +58,13 @@ func New() *ConcurrencyMap {
 	return &ConcurrencyMap{cMap: make(map[any]any)}
 }
 
-func (cm *ConcurrencyMap)Add(key, value any) {
+func (cm *ConcurrencyMap) Add(key, value any) {
 	cm.Lock()
 	cm.cMap[key] = value
 	cm.Unlock()
 }
 
-func (cm *ConcurrencyMap)Update(key, value any) {
+func (cm *ConcurrencyMap) Update(key, value any) {
 	cm.Lock()
 	if _, exists := cm.cMap[key]; exists {
 		cm.cMap[key] = value
@@ -72,13 +72,13 @@ func (cm *ConcurrencyMap)Update(key, value any) {
 	cm.Unlock()
 }
 
-func (cm *ConcurrencyMap)Delete(key any) {
+func (cm *ConcurrencyMap) Delete(key any) {
 	cm.Lock()
 	delete(cm.cMap, key)
 	cm.Unlock()
 }
 
-func (cm *ConcurrencyMap)GetValue(key any) any {
+func (cm *ConcurrencyMap) GetValue(key any) any {
 	cm.RLock()
 	defer cm.RUnlock()
 	return cm.cMap[key]

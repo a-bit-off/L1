@@ -11,29 +11,12 @@ func main() {
 
 	fmt.Println(set1)
 	fmt.Println(set2)
-	fmt.Println(Solution1(set1, set2))
-	fmt.Println(Solution2(set1, set2))
+	fmt.Println(solution1(set1, set2))
+	fmt.Println(solution2(set1, set2))
 
 }
 
-func Solution1(set1, set2 []any) []any {
-	size := (len(set1) + len(set2)) / 2
-	intersection := make([]any, 0, size)
-
-	for _, v1 := range set1 {
-		for _, v2 := range set2 {
-			if v1 == v2 {
-				intersection = append(intersection, v1) // добавляем все что совпадает в двух множествах
-				break
-			}
-		}
-
-	}
-
-	return intersection
-}
-
-func Solution2(set1, set2 []any) []any {
+func solution1(set1, set2 []any) []any {
 	size := (len(set1) + len(set2)) / 2
 	set := make(map[any]struct{})
 	intersection := make([]any, 0, size)
@@ -48,6 +31,24 @@ func Solution2(set1, set2 []any) []any {
 		if _, ok := set[v]; ok {
 			intersection = append(intersection, v)
 		}
+	}
+
+	return intersection
+}
+
+// менее производительное решение
+func solution2(set1, set2 []any) []any {
+	size := (len(set1) + len(set2)) / 2
+	intersection := make([]any, 0, size)
+
+	for _, v1 := range set1 {
+		for _, v2 := range set2 {
+			if v1 == v2 {
+				intersection = append(intersection, v1) // добавляем все что совпадает в двух множествах
+				break
+			}
+		}
+
 	}
 
 	return intersection

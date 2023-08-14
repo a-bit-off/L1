@@ -7,17 +7,27 @@ package main
 
 import (
 	"fmt"
-	"math"
 )
 
 func main() {
-	temperatures := []float64{-25.4, -27.0, 13.0, 19.0, 15.5, 24.5, -21.0, 5, 6, -1, -11, 1, -29.9, 32.5}
+	temperatures := []float64{
+		-31.1,
+		-29.9, -20.0,
+		-19.9, -15.5, -10.0,
+		-9.9, -5.5, 0, 3, 7, 9,
+		10, 15, 19,
+		20, 25,
+		30,
+	}
+	fmt.Println(Solution1(temperatures))
+}
+
+func Solution1(temperatures []float64) map[int][]float64 {
 	groupedTemp := make(map[int][]float64)
 
 	for _, temp := range temperatures {
-		group := int(math.Ceil(temp/10) * 10)
+		group := int(temp/10) * 10
 		groupedTemp[group] = append(groupedTemp[group], temp)
 	}
-
-	fmt.Println(groupedTemp)
+	return groupedTemp
 }

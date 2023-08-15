@@ -1,12 +1,17 @@
+# Устные Вопросы
 ## 1. Какой самый эффективный способ конкатенации строк?
-
-конкатенация в базовом виде - []byte  <br />
+Конкатенация в базовом виде - []byte  <br />
 ```
+strings := []string{"This ", "is ", "even ", "more ", "performant "}
+
 bs := make([]byte, 100)
 bl := 0
+
 for _, val := range strings {
     bl += copy(bs[bl:], []byte(val))
 }
+
+fmt.Println(string(bs[:]))
 ```
 ## 2. Что такое интерфейсы, как они применяются в Go?
 

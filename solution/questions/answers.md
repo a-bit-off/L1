@@ -1,13 +1,13 @@
 ## 1. Какой самый эффективный способ конкатенации строк?
 
-конкатенация в базовом виде - []byte
+конкатенация в базовом виде - []byte  <br />
 `
-bs := make([]byte, 100)
-bl := 0
-
-for _, val := range strings {
-    bl += copy(bs[bl:], []byte(val))
-}
+bs := make([]byte, 100)  <br />
+bl := 0  <br />
+ <br />
+for _, val := range strings {  <br />
+    bl += copy(bs[bl:], []byte(val))  <br />
+}  <br />
 `
 ## 2. Что такое интерфейсы, как они применяются в Go?
 

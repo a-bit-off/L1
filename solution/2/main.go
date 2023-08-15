@@ -15,10 +15,63 @@ func main() {
 	fmt.Println("Squaring_Solution_1:", Squaring_Solution_1(numbers))
 	fmt.Println("Squaring_Solution_2:", Squaring_Solution_2(numbers))
 	fmt.Println("Squaring_Solution_3:", Squaring_Solution_3(numbers))
+	fmt.Println("Squaring_Solution_4:", Squaring_Solution_3(numbers))
+}
+
+// Буферизованный канал
+func Squaring_Solution_1(numbers []int) []int {
+	length := len(numbers)
+	squareNums := make([]int, length)
+	ch := make(chan int, length)
+	defer close(ch)
+
+	// запускаем горутины в цикле и запысываем в канал данне
+	for _, num := range numbers {
+		go func(num int) {
+			ch <- num * num
+		}(num)
+	}
+
+	// считываем данные как только буфер заполнился
+	for i := 0; i < length; i++ {
+		square, ok := <-ch
+		if !ok {
+			return nil // обработка ошибки при чтении из канала
+		}
+		squareNums[i] = square
+	}
+
+	return squareNums
+}
+
+// Небуферизованный канал
+func Squaring_Solution_2(numbers []int) []int {
+	length := len(numbers)
+	squareNums := make([]int, length)
+	ch := make(chan int)
+	defer close(ch)
+
+	// запускаем горутины в цикле и запысываем в канал данне
+	for _, num := range numbers {
+		go func(num int) {
+			ch <- num * num
+		}(num)
+	}
+
+	// считываем данные как только буфер заполнился
+	for i := 0; i < length; i++ {
+		square, ok := <-ch
+		if !ok {
+			return nil // обработка ошибки при чтении из канала
+		}
+		squareNums[i] = square
+	}
+
+	return squareNums
 }
 
 // WaitGroup Mutex
-func Squaring_Solution_1(numbers []int) []int {
+func Squaring_Solution_3(numbers []int) []int {
 	squareNums := make([]int, len(numbers))
 	m := sync.Mutex{}
 	wg := sync.WaitGroup{}
@@ -38,56 +91,20 @@ func Squaring_Solution_1(numbers []int) []int {
 	return squareNums
 }
 
-// Небуферизованный канал
-func Squaring_Solution_2(numbers []int) []int {
-	length := len(numbers)
-	squareNums := make([]int, length)
-	ch := make(chan int)
-	done := make(chan struct{})
+// WaitGroup одна горутина
+func Squaring_Solution_4(numbers []int) []int {
+	squareNums := make([]int, len(numbers))
+	wg := sync.WaitGroup{}
 
-	// запускаем горутину в котором в цикле будут записыватся данные в канал ch
-	// done будет сигнализировать о том, что горутина завершилась
-	go func() {
-		defer close(ch)
-		defer close(done)
-
-		for _, num := range numbers {
-			ch <- num * num
+	wg.Add(1) // добавляем в счетчик +1(горутина)
+	go func(wg *sync.WaitGroup) {
+		defer wg.Done() // по завершении горутины вычитаем из счетчика wg
+		for i, num := range numbers {
+			squareNums[i] = num * num
 		}
-	}()
+	}(&wg)
 
-	for i := 0; i < length; i++ {
-		select {
-		case num := <-ch: // пока цикл работает мы получаем данные
-			squareNums[i] = num
-		case <-done: // после завершения горутины мы получим сигнал
-			return squareNums
-		}
-	}
-
-	return squareNums
-}
-
-// Буферизованный канал
-func Squaring_Solution_3(numbers []int) []int {
-	length := len(numbers)
-	squareNums := make([]int, length)
-	ch := make(chan int, length)
-
-	// создаем горутину в которой будем заполнять буф канал, до тех пор пока он не наполнится
-	go func() {
-		defer close(ch)
-
-		for _, num := range numbers {
-			ch <- num * num
-		}
-	}()
-
-	// цикл начнет считывать с канал только при условию наполнения канала
-	// разом считываем все данные
-	for i := 0; i < length; i++ {
-		squareNums[i] = <-ch
-	}
+	wg.Wait()
 
 	return squareNums
 }

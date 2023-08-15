@@ -4,7 +4,7 @@
 */
 package main
 
-import(
+import (
 	"fmt"
 	"sync"
 )
@@ -19,18 +19,18 @@ func main() {
 
 // WaitGroup Mutex
 func Squaring_Solution_1(numbers []int) []int {
-	squareNums := make([]int, 0, len(numbers))
+	squareNums := make([]int, len(numbers))
 	m := sync.Mutex{}
 	wg := sync.WaitGroup{}
 
-	for _, num := range numbers {
-		wg.Add(1)
-		go func (num int) {
-			defer wg.Done()
-			m.Lock()
-			squareNums = append(squareNums, num * num)
+	for i, num := range numbers {
+		wg.Add(1) // добавляем в счетчик +1(горутина)
+		go func(num, i int, wg *sync.WaitGroup) {
+			defer wg.Done() // по завершении горутины вычитаем из счетчика wg
+			m.Lock()        // блокируем область памяти для предоставления ее горутине (уникальный доступ к области памяти)
+			squareNums[i] = num * num
 			m.Unlock()
-		}(num)
+		}(num, i, &wg)
 	}
 
 	wg.Wait()
@@ -41,18 +41,28 @@ func Squaring_Solution_1(numbers []int) []int {
 // Небуферизованный канал
 func Squaring_Solution_2(numbers []int) []int {
 	length := len(numbers)
-	squareNums := make([]int, 0, length)
+	squareNums := make([]int, length)
 	ch := make(chan int)
-	defer close(ch)
+	done := make(chan struct{})
 
-	for _, num := range numbers {
-		go func(num int) {
+	// запускаем горутину в котором в цикле будут записыватся данные в канал ch
+	// done будет сигнализировать о том, что горутина завершилась
+	go func() {
+		defer close(ch)
+		defer close(done)
+
+		for _, num := range numbers {
 			ch <- num * num
-		}(num)
-	}
+		}
+	}()
 
 	for i := 0; i < length; i++ {
-		squareNums = append(squareNums, <-ch)
+		select {
+		case num := <-ch: // пока цикл работает мы получаем данные
+			squareNums[i] = num
+		case <-done: // после завершения горутины мы получим сигнал
+			return squareNums
+		}
 	}
 
 	return squareNums
@@ -61,18 +71,22 @@ func Squaring_Solution_2(numbers []int) []int {
 // Буферизованный канал
 func Squaring_Solution_3(numbers []int) []int {
 	length := len(numbers)
-	squareNums := make([]int, 0, length)
+	squareNums := make([]int, length)
 	ch := make(chan int, length)
-	defer close(ch)
 
-	for _, num := range numbers {
-		go func(num int) {
+	// создаем горутину в которой будем заполнять буф канал, до тех пор пока он не наполнится
+	go func() {
+		defer close(ch)
+
+		for _, num := range numbers {
 			ch <- num * num
-		}(num)
-	}
+		}
+	}()
 
+	// цикл начнет считывать с канал только при условию наполнения канала
+	// разом считываем все данные
 	for i := 0; i < length; i++ {
-		squareNums = append(squareNums, <-ch)
+		squareNums[i] = <-ch
 	}
 
 	return squareNums

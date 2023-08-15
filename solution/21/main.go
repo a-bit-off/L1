@@ -3,31 +3,39 @@
 */
 package main
 
-// первый интерфейс и его имплементация структурой File
-type Reader interface {
-	Read() string
+import "fmt"
+
+// Интерфейс, который описывает метод Request
+type Target interface {
+	Request() string
 }
 
-type File struct{}
-
-func (f *File) Read() string {
-	return "data from file"
+// Структура, которую мы хотим адаптировать
+type Adaptee struct {
 }
 
-// второй интерфейс и структура которая адаптиркует первую ко второму интерфейсу
-type Writer interface {
-	Writer(string)
+// Метод SpecificRequest, который мы хотим использовать через адаптер
+func (a *Adaptee) SpecificRequest() string {
+	return "Request"
 }
 
-type FileWriter struct {
-	file *File
+// Адаптер, реализующий интерфейс Target
+type Adapter struct {
+	// первый вариант наследование
+	*Adaptee
+	// второй вариант объект
+	//ad *Adaptee
 }
 
-func (fw *FileWriter) Write(data string) {
-	fw.file.Read()
+// Реализация метода Request через вызов метода SpecificRequest адаптируемого объекта
+func (a *Adapter) Request() string {
+	return a.SpecificRequest()
 }
 
 func main() {
-	writer := &FileWriter{file: &File{}}
-	writer.Write("Some data")
+	adaptree := &Adaptee{}
+	adapter := &Adapter{adaptree}
+
+	fmt.Println(adapter.SpecificRequest())
+	fmt.Println(adapter.Request())
 }

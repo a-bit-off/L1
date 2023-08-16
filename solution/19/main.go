@@ -21,7 +21,7 @@ func solution1(str string) string {
 	n := len(str)
 	reversed := make([]rune, n)
 	for i, r := range str {
-		reversed[n-1-i] = r
+		reversed[n-1-i] = r // 10-1-0 = r; 10-1-1 = r таким образом обеспечиватеся переворот
 	}
 	return string(reversed)
 }
@@ -29,7 +29,7 @@ func solution1(str string) string {
 // наименее производительное решение
 func solution2(str string) (reversed string) {
 	for _, r := range str {
-		reversed = string(r) + reversed
+		reversed = string(r) + reversed // a; ba; cba; к началу добавлям предыдущую строку
 	}
 	return reversed
 }

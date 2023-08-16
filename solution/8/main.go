@@ -4,16 +4,16 @@
 package main
 
 import (
-	"flag"
-	"log"
 	"errors"
+	"flag"
 	"fmt"
+	"log"
 )
 
 type Data struct {
 	number int64
-	pos int
-	value int
+	pos    int
+	value  int
 }
 
 func main() {
@@ -34,23 +34,23 @@ func ParseDate() (Data, error) {
 
 	data := Data{*number, *pos, *value}
 
-	if  *pos > 63 || *pos < 0 || *value < 0 || *value > 1 {
+	if *pos > 63 || *pos < 0 || *value < 0 || *value > 1 {
 		return data, errors.New("Out of range")
 	}
 	return data, nil
 }
 
-func (d *Data)SetBit() {
-	mask := int64(1) << d.pos
+func (d *Data) SetBit() {
+	mask := int64(1) << d.pos // создаем маску на ту позицую бита, которую нужно изменить
 	if d.value == 0 {
-		d.number = d.number &^ mask
+		d.number = d.number &^ mask // и исключающее или
 	} else if d.value == 1 {
-		d.number = d.number | mask
+		d.number = d.number | mask // или
 	}
 
 }
 
-func (d Data)PrintBinary() {
+func (d Data) PrintBinary() {
 	fmt.Printf("Binary representation of %d:\t", d.number)
 	for i := 63; i >= 0; i-- {
 		bit := (d.number >> i) & 1

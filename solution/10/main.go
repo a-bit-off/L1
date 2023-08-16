@@ -23,11 +23,13 @@ func main() {
 }
 
 func Solution1(temperatures []float64) map[int][]float64 {
+	// создаем мапу с ключом int (group)
+	// и значением массив не целых чисел []float64 (groups temp)
 	groupedTemp := make(map[int][]float64)
 
 	for _, temp := range temperatures {
-		group := int(temp/10) * 10
-		groupedTemp[group] = append(groupedTemp[group], temp)
+		group := int(temp/10) * 10                            // получаем группу (-12.5 / 10) * 10 = -10
+		groupedTemp[group] = append(groupedTemp[group], temp) // добавляем в группу соответствующую ей температуру
 	}
 	return groupedTemp
 }

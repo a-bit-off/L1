@@ -6,20 +6,21 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"runtime"
 	"sync"
 	"sync/atomic"
-	"fmt"
 	"time"
-	"runtime"
 )
 
 func main() {
+	wh := sync.WaitGroup{}
 
-	mainWG := sync.WaitGroup{}
-	mainWG.Add(1)
-	defer mainWG.Wait()
+	// запускаем горутину для корректного отображения безопасного завершения горутин
+	wh.Add(1)
+	defer wh.Wait()
 	go func() {
-		defer mainWG.Done()
+		defer wh.Done()
 		time.Sleep(time.Second * 7)
 	}()
 
@@ -36,7 +37,7 @@ func main() {
 		stopCh := make(chan int)
 		go Solution2(stopCh)
 		time.Sleep(time.Second * 2)
-		stopCh<-1 // stop goroutine
+		stopCh <- 1 // stop goroutine
 	}()
 
 	// Solution3
@@ -52,10 +53,9 @@ func main() {
 		var stopFlag int32 = 0
 		go Solution4(&stopFlag)
 		time.Sleep(time.Second * 4)
-		stopFlag = 1  // stop goroutine
+		stopFlag = 1 // stop goroutine
 	}()
 
-	// Solution5
 	go Solution5()
 
 }

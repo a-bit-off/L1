@@ -27,6 +27,7 @@ func main() {
 }
 
 func distance1(p1, p2 *Point) float64 {
+	// формула расчета расстояния на коор плоскости
 	a := p1.x - p2.x
 	b := p1.y - p2.y
 	return math.Sqrt(a*a + b*b)

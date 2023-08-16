@@ -8,6 +8,7 @@ package main
 import (
 	"fmt"
 )
+
 func main() {
 	ch1 := make(chan int)
 	ch2 := make(chan int)
@@ -17,21 +18,20 @@ func main() {
 		defer close(ch1)
 
 		for _, num := range nums {
-			ch1 <- num
+			ch1 <- num // зписываем данные в канал
 		}
 	}(ch1, nums)
 
 	go func(ch1, ch2 chan int, nums []int) {
 		defer close(ch2)
+
 		for num := range ch1 {
-			ch2 <- num * 2
+			ch2 <- num * 2 // считываем данные с канала ch1 и записываем их в ch2
 		}
 
 	}(ch1, ch2, nums)
-
 
 	for num := range ch2 {
 		fmt.Println(num)
 	}
 }
-

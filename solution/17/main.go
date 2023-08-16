@@ -37,10 +37,10 @@ func binarySearch(names []string, find string) (int, error) {
 		guess := names[mid]
 
 		if guess == find {
-			return mid, nil
-		} else if guess > find {
+			return mid, nil // в случае если мы находим, возвращаем ее индекс
+		} else if guess > find { // если текущая больше, то уменьшаем верхний предел на один
 			high = mid - 1
-		} else {
+		} else { // иначе нижнее увеличиваем на один
 			low = mid + 1
 		}
 	}

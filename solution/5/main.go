@@ -8,15 +8,16 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"sync"
 	"time"
-	"flag"
 )
 
 func main() {
 	n := Timeout()
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(n) * time.Second)
+	// создаем канал который отправит сигнал о завершении через n секунд
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(n)*time.Second)
 	defer cancel()
 	input := make(chan int)
 	wg := sync.WaitGroup{}
@@ -38,10 +39,10 @@ func Timeout() int {
 	return *n
 }
 
-func Read(ctx context.Context, inout chan int){
+func Read(ctx context.Context, inout chan int) {
 	for {
 		select {
-		case <-ctx.Done():
+		case <-ctx.Done(): // безопасное завершение горутины
 			return
 		default:
 			if val, ok := <-inout; ok {
@@ -57,7 +58,7 @@ func Write(ctx context.Context, input chan int) {
 
 	for {
 		select {
-		case <-ctx.Done():
+		case <-ctx.Done(): // безопасное завершение горутины
 			return
 		default:
 			input <- counter

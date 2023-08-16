@@ -15,13 +15,14 @@ func main() {
 }
 
 func solution1(str string) string {
-	words := strings.Fields(str)
+	words := strings.Fields(str) // получаем слайс и слов
 	size := len(words)
 	mid := size / 2
+	j := 0
 
 	for i := 0; i < mid; i++ {
-		j := size - 1 - i
-		words[i], words[j] = words[j], words[i]
+		j = size - 1 - i                        // 10-1-0
+		words[i], words[j] = words[j], words[i] // заменяем значения в слайсе по индексу
 	}
 	return strings.Join(words, " ")
 }

@@ -22,11 +22,13 @@ func quickSort(nums []int) []int {
 
 	for _, num := range nums[1:] {
 		if num <= pivot {
-			left = append(left, num)
+			left = append(left, num) // если число меньше чем pivot добавляем в левую группу
 		} else {
-			right = append(right, num)
+			right = append(right, num) // иначе в правую
 		}
 	}
 
+	// рекурсивно возвращаем все значения
+	// соединяем левую, опорную и правую части
 	return append(append(quickSort(left), pivot), quickSort(right)...)
 }

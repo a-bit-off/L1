@@ -51,7 +51,7 @@ func Squaring_Solution_2(numbers []int) []int {
 	ch := make(chan int)
 	defer close(ch)
 
-	// запускаем горутины в цикле и запысываем в канал данне
+	// запускаем горутины в цикле и запысываем в канал данные
 	for _, num := range numbers {
 		go func(num int) {
 			ch <- num * num

@@ -10,8 +10,8 @@ import (
 )
 
 type ConcurrencyMap struct {
-	cMap map[any]any
-	sync.RWMutex
+	cMap         map[any]any
+	sync.RWMutex // используем RWMutex для предоставления горутине уникального доступа (на чтение, на запись) к участку памяти cMap
 }
 
 func main() {
@@ -30,6 +30,7 @@ func main() {
 	m := New()
 	wg := sync.WaitGroup{}
 
+	// запускаем горутины с добавлением, удалением и обновлением
 	count := 0
 	for k, v := range testMap {
 		wg.Add(1)

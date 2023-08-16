@@ -19,12 +19,13 @@ func main() {
 
 func unique(str string) bool {
 	str = strings.ToLower(str)
-	u := make(map[rune]struct{})
+	u := make(map[rune]struct{}) // содаем set
+
 	for _, r := range str {
-		if _, ok := u[r]; ok {
+		if _, ok := u[r]; ok { // если данные уже там есть возвращаем false
 			return false
 		}
-		u[r] = struct{}{}
+		u[r] = struct{}{} // записываем все данные в set
 	}
 	return true
 }

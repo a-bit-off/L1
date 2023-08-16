@@ -9,13 +9,13 @@ package main
 
 import (
 	"context"
-	"sync"
+	"flag"
 	"fmt"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
-	"flag"
 )
 
 func main() {
@@ -24,6 +24,7 @@ func main() {
 	input := make(chan int)
 	n := CountOfWorkers()
 
+	// запускаем горутину которая будет слушать основной поток (ловим Ctrl+C)
 	go ListenerForSignals(cancel)
 
 	for i := 0; i < n; i++ {
@@ -49,16 +50,16 @@ func CountOfWorkers() int {
 func ListenerForSignals(cancel context.CancelFunc) {
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
-	<-sigCh
-	cancel()
+	<-sigCh  // ждем записи в канал
+	cancel() // завершаем программу
 }
 
 func Worker(ctx context.Context, input chan int) {
 	for {
 		select {
-		case <-ctx.Done():
+		case <-ctx.Done(): // в случае получения сигнала безопасно завершаем горутины
 			return
-		default:
+		default: // считываем с канала данные
 			if val, ok := <-input; ok {
 				fmt.Println(val)
 			}
@@ -72,9 +73,9 @@ func Writer(ctx context.Context, input chan int) {
 
 	for {
 		select {
-		case <-ctx.Done():
+		case <-ctx.Done(): // в случае получения сигнала безопасно завершаем горутины
 			return
-		default:
+		default: // иначе пишем в канал
 			input <- counter
 			counter++
 			time.Sleep(time.Second * 1)

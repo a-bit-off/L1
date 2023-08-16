@@ -4,7 +4,7 @@
 */
 package main
 
-import(
+import (
 	"fmt"
 	"sync"
 	"sync/atomic"
@@ -19,23 +19,22 @@ func main() {
 	fmt.Println("SquaringSum_Solution_4:", SquaringSum_Solution_4(numbers))
 }
 
-
 // atomic
 func SquaringSum_Solution_1(numbers []int) int {
 	done := make(chan struct{})
 	defer close(done)
-
 	var squaringSum atomic.Int32
 	length := len(numbers)
 
 	for _, num := range numbers {
 		go func(num int) {
+			// атомарное выполнение программы
 			squaringSum.Add(int32(num * num))
 			done <- struct{}{}
 		}(num)
 	}
 
-	for i := 0; i < length; i++{
+	for i := 0; i < length; i++ {
 		<-done
 	}
 
@@ -50,7 +49,7 @@ func SquaringSum_Solution_2(numbers []int) int {
 
 	for _, num := range numbers {
 		wg.Add(1)
-		go func (num int) {
+		go func(num int) {
 			defer wg.Done()
 			m.Lock()
 			squaringSum += num * num
@@ -65,11 +64,10 @@ func SquaringSum_Solution_2(numbers []int) int {
 
 // Небуферизованный канал
 func SquaringSum_Solution_3(numbers []int) int {
-	ch := make(chan int)
-	defer close(ch)
-
 	length := len(numbers)
 	var squaringSum int
+	ch := make(chan int)
+	defer close(ch)
 
 	for _, num := range numbers {
 		go func(num int) {
@@ -79,7 +77,11 @@ func SquaringSum_Solution_3(numbers []int) int {
 
 	// Ждем завершения всех горутин и закрываем канал после этого
 	for i := 0; i < length; i++ {
-		squaringSum += <-ch
+		square, ok := <-ch
+		if !ok {
+			return 0 // обработка ошибки при чтении из канала
+		}
+		squaringSum += square
 	}
 
 	return squaringSum
@@ -89,7 +91,6 @@ func SquaringSum_Solution_3(numbers []int) int {
 func SquaringSum_Solution_4(numbers []int) int {
 	var squaringSum int
 	length := len(numbers)
-
 	ch := make(chan int, length)
 	defer close(ch)
 
@@ -101,9 +102,12 @@ func SquaringSum_Solution_4(numbers []int) int {
 
 	// Ждем завершения всех горутин и закрываем канал после этого
 	for i := 0; i < length; i++ {
-		squaringSum += <-ch
+		square, ok := <-ch
+		if !ok {
+			return 0 // обработка ошибки при чтении из канала
+		}
+		squaringSum += square
 	}
 
 	return squaringSum
 }
-
